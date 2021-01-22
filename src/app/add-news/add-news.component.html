@@ -1,0 +1,51 @@
+<div>Logged in as <b>{{ user.displayName }}</b></div>
+<div>
+    <h4>Add news here!</h4>
+    <form (ngSubmit)="addNews()">
+    <div class="row mb-3">
+
+        <div class="col-md-6">
+        <label for="country">Country of interest</label>
+         <!--<input
+            type="string"
+            id="country"
+            name="country"
+            class="form-control"
+            placeholder="Which country are you writing about?"
+            [(ngModel)]="country"
+            required
+        />--><select
+                type="string"
+                id="country"
+                name="countryInput"
+                class="form-control"
+                [(ngModel)]="country"
+                required
+                >
+            <option selected="selected" [ngValue]="world">Worldwide</option>
+            <option *ngFor="let country of countries" [ngValue]="country.Country">
+                {{country.Country}}
+            </option>
+        </select>
+    
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-12">
+        <label for="descriptionInput">News description</label>
+         <input
+            type="text"
+            id="descriptionInput"
+            name="descriptionInput"
+            class="form-control"
+            placeholder="Write your news here..."
+            [(ngModel)]="description"
+            required
+        />
+        
+        </div>
+    </div>
+    <button class="btn btn-primary" [disabled]="description == undefined || country == undefined">Add</button>
+    </form>
+
+</div>

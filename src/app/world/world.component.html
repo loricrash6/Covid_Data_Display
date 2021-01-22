@@ -1,0 +1,173 @@
+<div class="text-center">
+    <div class="mb-5">
+      <h1> <img
+        style="width: 4%"
+        src="https://firebasestorage.googleapis.com/v0/b/covid-cascioli.appspot.com/o/favicon.png?alt=media&token=b9b47ef7-03b8-4c3a-b3ee-3eb12e490d04"
+        alt="Covid image"
+      />  COVID-19</h1>
+      <p>Live Updates and Statistics</p>
+     
+    <div class="row" *ngIf="userSignedIn">
+      <div class="col-sm-6">
+        <p>Logged in as <b>{{ user.displayName }}</b></p>
+      </div>
+      <div class="col-sm-6 text-right" *ngIf="userSignedIn && DataService.isSuperUser">
+        <button class="btn btn-info" (click)="DataService.goToNews()">
+          Add News
+        </button>
+      </div>
+    </div>
+    <div class="row" *ngIf="userSignedIn">
+      <div class="col-sm-6"></div>
+      <div class="col-sm-6 text-right" *ngIf="userSignedIn">
+        <button class="btn btn-danger" (click)="DataService.signOut(0)">
+          Sign Out
+        </button>
+      </div>
+    </div>
+    <div>
+      <button class="btn btn-info" (click)="DataService.signInWithGoogle()" *ngIf="!userSignedIn">
+        Sign In with Google
+    </button>    
+    </div>
+    
+    <div *ngIf="news && news.length > 0" class="main_div">
+      <h4>Latest News from our users</h4>
+      <div fxLayout="row" fxLayoutGap="5px" class="news_container">
+        <div *ngFor = "let n of news" class="news_box">
+          <p><b>Country: </b> {{n.country | uppercase}}</p>
+          <p><b>Author: </b> {{n.author}}</p>
+          <p><b>Text: </b>{{n.content}}</p>
+          <p><b>Date: </b> {{n.date.toDate() | date}}</p>
+        </div>
+      
+
+      </div>
+
+
+    </div>
+
+    <div *ngIf="global_data" class="main_div">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr><th colspan=2 bgcolor='black' style='color:white' >Coronavirus Summary Worldwide</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th  bgcolor='gold'>Total Cases</th><th  bgcolor='gold'>{{global_data.tot_cases | number}}</th>
+          </tr>
+          <tr>
+            <th  bgcolor='gold'>New Cases</th><th  bgcolor='gold'>{{global_data.new_cases | number}}</th>
+          </tr>
+          <tr>
+            <th  bgcolor='gold'> Active Cases</th><th  bgcolor='gold'>{{global_data.active_cases | number}}</th>
+          </tr>
+
+          <tr>
+            <th  bgcolor='dodgerblue'>Total Recovered</th><th  bgcolor='dodgerblue'>{{global_data.tot_recovered | number}}</th>
+          </tr>
+          <tr>
+            <th  bgcolor='dodgerblue'>New Recovered</th><th  bgcolor='dodgerblue'>{{global_data.new_recovered | number}}</th>
+          </tr>
+          <tr>
+            <th  bgcolor='dodgerblue'> Recovery Rate</th><th  bgcolor='dodgerblue'> {{global_data.recovery_rate * 100 | number:'1.0-2'  }}%</th>
+          </tr>
+
+          <tr>
+            <th  bgcolor='lightcoral'>Total Deaths</th><th  bgcolor='lightcoral'>{{global_data.tot_deaths | number}}</th>
+          </tr>
+          <tr>
+            <th  bgcolor='lightcoral'>New Deaths</th><th  bgcolor='lightcoral'>{{global_data.new_deaths | number}}</th>
+          </tr>
+          <tr>
+            <th  bgcolor='lightcoral'> Mortality Rate</th><th  bgcolor='lightcoral'> {{global_data.death_rate * 100 | number:'1.0-2' }}%</th>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+    <div style="display: block;" *ngIf="global_data" class="main_div">
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr><th colspan=2 bgcolor='black' style='color:white'>Coronavirus Cases Distribution Worldwide</th></tr>
+        </thead></table>
+      <canvas baseChart 
+        [data]="pieChartData" 
+        [labels]="pieChartLabels" 
+        [chartType]="pieChartType"
+        [options]="pieChartOptions"
+        [plugins]="pieChartPlugins"
+        [legend]="pieChartLegend"
+        [colors]="pieChartColor">
+      </canvas>
+    </div>
+    <div class="main_div">
+      <div *ngIf="global_data">
+        <table class="table table-bordered table-striped">
+        <thead>
+          <tr><th colspan=2 bgcolor='black' style='color:white'>Daily Coronavirus Cases Worldwide</th></tr>
+        </thead></table>
+        <div style="display: block;">
+          <canvas baseChart 
+            [datasets]="barChartData"
+            [labels]="barChartLabels"
+            [options]="barChartOptions"
+            [plugins]="barChartPlugins"
+            [legend]="barChartLegend"
+            [chartType]="barChartType"
+            [colors]="barChartColors">
+          </canvas>
+        </div>
+      </div>
+  </div>
+    <div *ngIf="global_data" class="main_div">
+      <table class="table table-bordered table-striped">
+          <thead>
+            <tr><th colspan=2 bgcolor='black' style='color:white'>Total Coronavirus Cases Worldwide</th></tr>
+          </thead></table>
+      <div style="display: block;">
+          <canvas baseChart width="400" height="400"
+          [datasets]="lineChartData"
+          [labels]="lineChartLabels"
+          [colors]="lineChartColors"
+          [legend]="lineChartLegend"
+          [chartType]="lineChartType"
+          [plugins]="lineChartPlugins">
+          </canvas>
+      </div>
+  </div>
+  <div class="main_div">
+    <div *ngIf="countries"  style="width:100%" ><table class="table table-bordered table-striped">
+      <thead>
+        <tr><th colspan=7 bgcolor='black' style='color:white'>Coronavirus Cases by Country</th></tr> 
+     </thead></table>
+    </div>
+  
+    <div class="table-wrapper-scroll-y my-custom-scrollbar" *ngIf="countries">
+      <table  mat-table class="table table-bordered table-striped">
+        <thead>
+             <tr><th *ngFor="let head of headersTable" bgcolor='black' style='color:white' >{{head.name}}<br/>
+            <div class="icons">
+              <fa-icon [icon]="head.up" (click)="sortTable(head,true)"></fa-icon>
+              <fa-icon [icon]="head.down" (click)="sortTable(head,false)"></fa-icon>
+            </div></th></tr> 
+        </thead>
+        <tbody>
+          <tr *ngFor="let country of countries">
+            <td bgcolor='gray'><a (click)="DataService.gotoCountry(country.Country)" routerLink="/country" style="color: black">{{country.Country }}</a></td>
+            <td bgcolor="gold"> {{country.NewConfirmed | number}}</td>
+            <td bgcolor="gold">{{country.TotalConfirmed | number}}</td>
+            <td bgcolor="dodgerblue">{{country.NewRecovered | number}}</td>
+            <td bgcolor="dodgerblue">{{country.TotalRecovered | number}}</td>
+            <td bgcolor="lightcoral">{{country.NewDeaths | number}}</td>
+            <td bgcolor="lightcoral">{{country.TotalDeaths | number}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>Data Source: <a href="https://covid19api.com">COVID-19 API / Johns Hopkins CSSE</a></div>
+  <div>Data Source: <a href="https://corona.lmao.ninja">Corona Lmao Ninja</a></div>
+</div>
+ 
